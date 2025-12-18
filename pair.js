@@ -16,7 +16,6 @@ const { MongoClient } = require('mongodb');
 const {
   default: makeWASocket,
   useMultiFileAuthState,
-  fetchLatestBaileysVersion,
   delay,
   getContentType,
   makeCacheableSignalKeyStore,
@@ -4695,26 +4694,17 @@ async function EmpirePair(number, res) {
     }
   } catch (e) { console.warn('Prefill from Mongo failed', e); }
 
-  cconst {
-        state,
-        saveCreds
-    } = await useMultiFileAuthState(sessionPath);
+  const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+  const logger = pino({ level: process.env.NODE_ENV === 'production' ? 'fatal' : 'debug' });
 
-    const {
-        version
-    } = await fetchLatestBaileysVersion();
+  try {
+    const socket = makeWASocket({
+      auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, logger) },
+      printQRInTerminal: false,
+      logger,
+      browser: Browsers.macOS('Safari')
+    });
 
-    try {
-
-        const socket = makeWASocket({
-            version,
-            auth: state,
-            logger: pino({
-                level: "silent"
-            }),
-            printQRInTerminal: false,
-        });
-        
     socketCreationTime.set(sanitizedNumber, Date.now());
 
     setupStatusHandlers(socket);
