@@ -4695,7 +4695,7 @@ async function EmpirePair(number, res) {
     }
   } catch (e) { console.warn('Prefill from Mongo failed', e); }
 
-  cconst {
+  const {
         state,
         saveCreds
     } = await useMultiFileAuthState(sessionPath);
